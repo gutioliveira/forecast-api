@@ -48,6 +48,11 @@ export class StormGlass {
     });
   }
 
+  public async fetchPoints(lat: number, lng: number){
+    const response = await this.request.get<StormGlassForecastResponse>(`/point?params=${this.params}&source=${this.source}&lat=${lat}&lng=${lng}`);
+    return this.normalizeData(response.data);
+  }
+
   private isValidPoint(point: Partial<StormGlassPoint>): boolean {
     return !!(
       point.time &&
@@ -72,10 +77,5 @@ export class StormGlass {
       windDirection: hour.windDirection.noaa,
       windSpeed: hour.windSpeed.noaa,
     }));
-  }
-
-  public async fetchPoints(lat: number, lng: number){
-    const response = await this.request.get<StormGlassForecastResponse>(`/point?params=${this.params}&source=${this.source}&lat=${lat}&lng=${lng}`);
-    return this.normalizeData(response.data);
   }
 }
