@@ -1,4 +1,5 @@
-import axios, { AxiosInstance, AxiosStatic } from 'axios';
+import { InternalError } from '@src/util/errors/internal-error';
+import axios, { AxiosError, AxiosInstance, AxiosStatic } from 'axios';
 
 const API_KEY = '395497fe-480e-11ed-a138-0242ac130002-39549858-480e-11ed-a138-0242ac130002';
 
@@ -32,6 +33,21 @@ export interface StormGlassForecastResponseNormalized {
   windSpeed: number;
 }
 
+export class ClientRequestError extends InternalError {
+  constructor(message: string){
+    const internalMessage = `Unexpected error when trying to comunicate with StormGlass: ${message}`;
+    super(internalMessage, 500);
+  }
+}
+
+export class StormGlassResponseError extends InternalError {
+  constructor(message: string) {
+    const internalMessage =
+      'Unexpected error returned by the StormGlass service';
+    super(`${internalMessage}: ${message}`);
+  }
+}
+
 export class StormGlass {
 
   private params = 'swellDirection%2CswellHeight%2CswellPeriod%2CwaveDirection%2CwaveHeight%2CwindDirection%2CwindSpeed';
@@ -49,8 +65,27 @@ export class StormGlass {
   }
 
   public async fetchPoints(lat: number, lng: number){
-    const response = await this.request.get<StormGlassForecastResponse>(`/point?params=${this.params}&source=${this.source}&lat=${lat}&lng=${lng}`);
-    return this.normalizeData(response.data);
+    try {
+      const response = await this.request.get<StormGlassForecastResponse>(
+        `/point?params=${this.params}&source=${this.source}&lat=${lat}&lng=${lng}`,
+        {
+          headers: {
+            Authorization: 'fake-token'
+          }
+        }
+      );
+      return this.normalizeData(response.data);
+    } catch(e: unknown) {
+      const axiosError = e as AxiosError;
+      if (axiosError.response?.status){
+        throw new StormGlassResponseError(
+          `Error: ${JSON.stringify(axiosError.response.data)} Code: ${
+            axiosError.response.status
+          }`
+        )
+      }
+      throw new ClientRequestError((e as Error).message);
+    }
   }
 
   private isValidPoint(point: Partial<StormGlassPoint>): boolean {
