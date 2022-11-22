@@ -1,6 +1,6 @@
 import { InternalError } from '@src/util/errors/internal-error';
 import config, { IConfig } from 'config';
-import axios, { AxiosError, AxiosInstance, AxiosStatic } from 'axios';
+import * as HTTPUtil from '@src/util/request';
 
 export interface StormGlassPointSource {
   [key: string]: number;
@@ -56,16 +56,7 @@ export class StormGlass {
   private params = 'swellDirection%2CswellHeight%2CswellPeriod%2CwaveDirection%2CwaveHeight%2CwindDirection%2CwindSpeed';
   private source = 'noaa';
 
-  private request: AxiosInstance; 
-
-  constructor(request?: AxiosStatic){
-    this.request = request || axios.create({
-      baseURL: `${stormglassResourceConfig.get('apiUrl')}/weather`,
-      headers: {
-        Authorization: stormglassResourceConfig.get('apiToken')
-      }
-    });
-  }
+  constructor(private request = new HTTPUtil.Request()){}
 
   public async fetchPoints(lat: number, lng: number){
     try {
@@ -78,12 +69,17 @@ export class StormGlass {
         }
       );
       return this.normalizeData(response.data);
-    } catch(e: unknown) {
-      const axiosError = e as AxiosError;
-      if (axiosError.response?.status){
-        throw new StormGlassResponseError(`Error: ${JSON.stringify(axiosError.response.data)} Code: ${axiosError.response.status}`);
+    } catch(err: unknown) {
+      if (err instanceof Error && HTTPUtil.Request.isRequestError(err)) {
+        const error = HTTPUtil.Request.extractErrorData(err);
+        throw new StormGlassResponseError(
+          `Error: ${JSON.stringify(error.data)} Code: ${error.status}`
+        );
       }
-      throw new ClientRequestError((e as Error).message);
+      /**
+       * All the other errors will fallback to a generic client error
+       */
+      throw new ClientRequestError(JSON.stringify(err));
     }
   }
 
