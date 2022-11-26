@@ -33,7 +33,7 @@ export interface StormGlassForecastResponseNormalized {
 }
 
 export class ClientRequestError extends InternalError {
-  constructor(message: string){
+  constructor(message: string) {
     const internalMessage = `Unexpected error when trying to comunicate with StormGlass: ${message}`;
     super(internalMessage, 500);
   }
@@ -52,24 +52,24 @@ const stormglassResourceConfig: IConfig = config.get(
 );
 
 export class StormGlass {
-
-  private params = 'swellDirection%2CswellHeight%2CswellPeriod%2CwaveDirection%2CwaveHeight%2CwindDirection%2CwindSpeed';
+  private params =
+    'swellDirection%2CswellHeight%2CswellPeriod%2CwaveDirection%2CwaveHeight%2CwindDirection%2CwindSpeed';
   private source = 'noaa';
 
-  constructor(private request = new HTTPUtil.Request()){}
+  constructor(private request = new HTTPUtil.Request()) {}
 
-  public async fetchPoints(lat: number, lng: number){
+  public async fetchPoints(lat: number, lng: number) {
     try {
       const response = await this.request.get<StormGlassForecastResponse>(
         `/point?params=${this.params}&source=${this.source}&lat=${lat}&lng=${lng}`,
         {
           headers: {
-            Authorization: stormglassResourceConfig.get('apiToken')
-          }
+            Authorization: stormglassResourceConfig.get('apiToken'),
+          },
         }
       );
       return this.normalizeData(response.data);
-    } catch(err: unknown) {
+    } catch (err: unknown) {
       if (err instanceof Error && HTTPUtil.Request.isRequestError(err)) {
         const error = HTTPUtil.Request.extractErrorData(err);
         throw new StormGlassResponseError(
@@ -96,16 +96,20 @@ export class StormGlass {
     );
   }
 
-  private normalizeData(response: StormGlassForecastResponse): StormGlassForecastResponseNormalized[]{
-    return response.hours.filter(this.isValidPoint.bind(this)).map((hour: StormGlassPoint) => ({
-      swellDirection: hour.swellDirection.noaa,
-      swellHeight: hour.swellHeight.noaa,
-      swellPeriod: hour.swellPeriod.noaa,
-      time: hour.time,
-      waveDirection: hour.waveDirection.noaa,
-      waveHeight: hour.waveHeight.noaa,
-      windDirection: hour.windDirection.noaa,
-      windSpeed: hour.windSpeed.noaa,
-    }));
+  private normalizeData(
+    response: StormGlassForecastResponse
+  ): StormGlassForecastResponseNormalized[] {
+    return response.hours
+      .filter(this.isValidPoint.bind(this))
+      .map((hour: StormGlassPoint) => ({
+        swellDirection: hour.swellDirection.noaa,
+        swellHeight: hour.swellHeight.noaa,
+        swellPeriod: hour.swellPeriod.noaa,
+        time: hour.time,
+        waveDirection: hour.waveDirection.noaa,
+        waveHeight: hour.waveHeight.noaa,
+        windDirection: hour.windDirection.noaa,
+        windSpeed: hour.windSpeed.noaa,
+      }));
   }
 }
