@@ -2,7 +2,7 @@ import { User } from "@src/models/user";
 
 describe('User functional tests', () => {
 
-  beforeAll(async () => {
+  beforeEach(async () => {
     await User.deleteMany({});
   });
 
