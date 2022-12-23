@@ -13,9 +13,7 @@ export class UserController {
       await user.save();
       res.status(201).send(user);
     } catch(e){
-      if (e instanceof MongoServerError){
-        res.status(422).send({error: e.message})
-      } else if (e instanceof mongoose.Error.ValidationError){
+      if (e instanceof mongoose.Error.ValidationError || e instanceof MongoServerError){
         res.status(422).send({error: e.message})
       } else {
         res.status(500).send({error: 'Internal Server Error'});
