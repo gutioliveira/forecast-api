@@ -14,7 +14,6 @@ export class ForecastController {
       const forecastData = await forecast.processForecastForBeaches(beaches);
       res.status(200).send(forecastData);
     } catch(e){
-      console.error(e);
       res.status(500).send({error: 'Internal Server Error'});
     }
   }
