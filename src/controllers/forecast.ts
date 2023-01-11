@@ -1,20 +1,22 @@
 import { Controller, Get } from '@overnightjs/core';
 import { Beach } from '@src/models/beach';
 import { Forecast } from '@src/services/forecast';
+import { HTTP_CODES } from '@src/util/request';
 import { Request, Response } from 'express';
+import BaseController from './base';
 
 const forecast = new Forecast();
 
 @Controller('forecast')
-export class ForecastController {
+export class ForecastController extends BaseController {
   @Get('')
   public async getForecastForgeLoggedUser(_: Request, res: Response): Promise<void> {
     try {
       const beaches = await Beach.find({});
       const forecastData = await forecast.processForecastForBeaches(beaches);
-      res.status(200).send(forecastData);
+      res.status(HTTP_CODES.OK).send(forecastData);
     } catch(e){
-      res.status(500).send({error: 'Internal Server Error'});
+      this.sendCreatedUpdateErrorResponse(res, e);
     }
   }
 }

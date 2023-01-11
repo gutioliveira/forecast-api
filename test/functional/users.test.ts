@@ -1,4 +1,4 @@
-import { User } from "@src/models/user";
+import { comparePasswords, User } from "@src/models/user";
 
 describe('User functional tests', () => {
 
@@ -15,7 +15,8 @@ describe('User functional tests', () => {
       };
       const { body, status } = await global.testRequest.post('/user', ).send(newUser);
       expect(status).toBe(201);
-      expect(body).toEqual(expect.objectContaining(newUser));
+      await expect(comparePasswords(newUser.password, body.password)).resolves.toBeTruthy();
+      expect(body).toEqual(expect.objectContaining({...newUser, password: expect.any(String)}));
     });
 
     it('should receive an error when creating user with invalid email', async () => {
@@ -26,7 +27,7 @@ describe('User functional tests', () => {
       };
       const { body, status } = await global.testRequest.post('/user', ).send(newUser);
       expect(status).toBe(422);
-      expect(body).toEqual({error: 'User validation failed: email: john is not a valid email'});
+      expect(body).toEqual({code: 422, error: 'User validation failed: email: john is not a valid email'});
     });
 
     it('should receive an error if already exists user with same email', async () => {
@@ -42,8 +43,8 @@ describe('User functional tests', () => {
         password: '1234'
       };
       const { body, status } = await global.testRequest.post('/user', ).send(newUser);
-      expect(status).toBe(422);
-      expect(body).toEqual({error: "E11000 duplicate key error collection: surf-forecast.users index: email_1 dup key: { email: \"john@mail.com\" }"});
+      expect(status).toBe(409);
+      expect(body).toEqual({code: 409, error: "E11000 duplicate key error collection: surf-forecast.users index: email_1 dup key: { email: \"john@mail.com\" }"});
     });
   });
 });

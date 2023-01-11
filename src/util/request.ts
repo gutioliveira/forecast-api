@@ -1,5 +1,17 @@
 import axios, { AxiosRequestConfig, AxiosResponse, AxiosError } from 'axios';
 
+export enum HTTP_CODES {
+  VALIDATION_ERROR = 422,
+  CONFLICT = 409,
+  OK = 200,
+  CREATED = 201,
+  INTERNAL_SERVER_ERROR = 500,
+}
+
+export enum RESPONSE_MESSAGES {
+  INTERNAL_SERVER_ERROR = 'Internal Server Error'
+}
+
 /* eslint-disable @typescript-eslint/no-empty-interface */
 export interface RequestConfig extends AxiosRequestConfig {}
 /* eslint-disable @typescript-eslint/no-explicit-any */

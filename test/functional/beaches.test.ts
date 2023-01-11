@@ -32,7 +32,7 @@ describe('Beach functional tests', () => {
       };
       const { body, status } = await global.testRequest.post('/beach', ).send(newBeach);
       expect(status).toBe(422);
-      expect(body).toEqual({error: 'Beach validation failed: lat: Cast to Number failed for value "invalid value" (type string) at path "lat"'});
+      expect(body).toEqual({code: 422, error: 'Beach validation failed: lat: Cast to Number failed for value "invalid value" (type string) at path "lat"'});
     });
 
     it('should throw 500 when there is an unexpected error', async () => {
@@ -46,7 +46,7 @@ describe('Beach functional tests', () => {
         .mockImplementationOnce(() => Promise.reject('Fails'))
       const { body, status } = await global.testRequest.post('/beach', ).send(newBeach);
       expect(status).toBe(500);
-      expect(body).toEqual({error: 'Internal Server Error'});
+      expect(body).toEqual({code: 500, error: 'Internal Server Error'});
     });
   });
 });

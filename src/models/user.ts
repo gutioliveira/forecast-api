@@ -1,4 +1,5 @@
 import mongoose, { Document, Model } from "mongoose";
+import bcrypt from 'bcrypt';
 
 export interface User {
   _id?: string;
@@ -7,9 +8,20 @@ export interface User {
   password: string;
 }
 
+export async function hashPassword(password: string, salt = 10): Promise<string> {
+  return await bcrypt.hash(password, salt);
+}
+
+export async function comparePasswords(password: string, hashedPassword: string): Promise<boolean> {
+  return await bcrypt.compare(password, hashedPassword);
+}
+
 const schema = new mongoose.Schema(
   {
-    name: { type: String, required: true },
+    name: { 
+      type: String, 
+      required: true,
+    },
     email: {
       type: String,
       trim: true,
@@ -35,6 +47,18 @@ const schema = new mongoose.Schema(
     }
   }
 );
+
+schema.pre<UserModel>('save', async function(): Promise<void> {
+  if (!this.password || !this.isModified('password')){
+    return;
+  }
+  try {
+    const hashedPassword = await hashPassword(this.password);
+    this.password = hashedPassword;
+  } catch(e){
+    console.error(`Failed to hash password for user ${this.name}`);
+  }
+});
 
 interface UserModel extends Omit<User, '_id'>, Document {}
 
