@@ -1,19 +1,11 @@
+import { hashPassword } from "@src/util/auth";
 import mongoose, { Document, Model } from "mongoose";
-import bcrypt from 'bcrypt';
 
 export interface User {
   _id?: string;
   name: string;
   email: string;
   password: string;
-}
-
-export async function hashPassword(password: string, salt = 10): Promise<string> {
-  return await bcrypt.hash(password, salt);
-}
-
-export async function comparePasswords(password: string, hashedPassword: string): Promise<boolean> {
-  return await bcrypt.compare(password, hashedPassword);
 }
 
 const schema = new mongoose.Schema(

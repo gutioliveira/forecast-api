@@ -1,4 +1,5 @@
-import { comparePasswords, User } from "@src/models/user";
+import { User } from "@src/models/user";
+import { comparePasswords } from "@src/util/auth";
 
 describe('User functional tests', () => {
 
@@ -45,6 +46,43 @@ describe('User functional tests', () => {
       const { body, status } = await global.testRequest.post('/user', ).send(newUser);
       expect(status).toBe(409);
       expect(body).toEqual({code: 409, error: "E11000 duplicate key error collection: surf-forecast.users index: email_1 dup key: { email: \"john@mail.com\" }"});
+    });
+  });
+
+  describe('when authenticating an user', () => {
+    it('should generate a new token for a valid user', async () => {
+      const newUser = {
+        name: 'John Doe',
+        email: 'john@mail.com',
+        password: '1234'
+      }
+      await new User(newUser).save();
+      const { body } = await global.testRequest.post('/user/authenticate', ).send({ email: newUser.email, password: newUser.password});
+      expect(body).toEqual(
+        expect.objectContaining({token: expect.any(String)})
+      )
+    });
+
+    it('should return error if password is different', async () => {
+      const newUser = {
+        name: 'John Doe',
+        email: 'john@mail.com',
+        password: '1234'
+      }
+      await new User(newUser).save();
+      const { body } = await global.testRequest.post('/user/authenticate', ).send({ email: newUser.email, password: 'wrong'});
+      expect(body).toEqual({code: 404, error: "Email or Password invalid"});
+    });
+
+    it('should return error if user is not found', async () => {
+      const newUser = {
+        name: 'John Doe',
+        email: 'john@mail.com',
+        password: '1234'
+      }
+      await new User(newUser).save();
+      const { body } = await global.testRequest.post('/user/authenticate', ).send({ email: 'email@mail.com', password: 'wrong'});
+      expect(body).toEqual({code: 404, error: "Email or Password invalid"});
     });
   });
 });

@@ -3,13 +3,15 @@ import axios, { AxiosRequestConfig, AxiosResponse, AxiosError } from 'axios';
 export enum HTTP_CODES {
   VALIDATION_ERROR = 422,
   CONFLICT = 409,
+  NOT_FOUND = 404,
   OK = 200,
   CREATED = 201,
   INTERNAL_SERVER_ERROR = 500,
 }
 
 export enum RESPONSE_MESSAGES {
-  INTERNAL_SERVER_ERROR = 'Internal Server Error'
+  INTERNAL_SERVER_ERROR = 'Internal Server Error',
+  EMAIL_PASSWORD_WRONG = 'Email or Password invalid'
 }
 
 /* eslint-disable @typescript-eslint/no-empty-interface */
