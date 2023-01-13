@@ -1,4 +1,4 @@
-import { hashPassword } from "@src/util/auth";
+import { hashPassword } from "@src/services/auth";
 import mongoose, { Document, Model } from "mongoose";
 
 export interface User {

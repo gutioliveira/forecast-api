@@ -1,5 +1,5 @@
 import { User } from "@src/models/user";
-import { comparePasswords } from "@src/util/auth";
+import { comparePasswords } from "@src/services/auth";
 
 describe('User functional tests', () => {
 
