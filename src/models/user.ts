@@ -1,4 +1,4 @@
-import { hashPassword } from "@src/services/auth";
+import AuthService from "@src/services/auth";
 import mongoose, { Document, Model } from "mongoose";
 
 export interface User {
@@ -45,7 +45,7 @@ schema.pre<UserModel>('save', async function(): Promise<void> {
     return;
   }
   try {
-    const hashedPassword = await hashPassword(this.password);
+    const hashedPassword = await AuthService.hashPassword(this.password);
     this.password = hashedPassword;
   } catch(e){
     console.error(`Failed to hash password for user ${this.name}`);

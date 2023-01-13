@@ -28,13 +28,15 @@ export class UserController extends BaseController {
       }
       const password = user?.password || '';
       if (await AuthService.comparePasswords(req.body.password, password)){
-        res.status(HTTP_CODES.OK).send({token: AuthService.generateToken(user)});
+        const token = AuthService.generateToken(user.toJSON());
+        res.status(HTTP_CODES.OK).send({token});
         return;
       } else {
         res.status(HTTP_CODES.NOT_FOUND).send({code: HTTP_CODES.NOT_FOUND, error: RESPONSE_MESSAGES.EMAIL_PASSWORD_WRONG});
         return ;
       }
     } catch(error){
+      console.log(`Catch`, error);
       res.status(HTTP_CODES.INTERNAL_SERVER_ERROR).send({code: HTTP_CODES.INTERNAL_SERVER_ERROR, error: RESPONSE_MESSAGES.INTERNAL_SERVER_ERROR})
     }
   }
