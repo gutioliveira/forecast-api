@@ -1,9 +1,21 @@
 import { Beach } from "@src/models/beach";
+import { User } from "@src/models/user";
+import AuthService from "@src/services/auth";
 
 describe('Beach functional tests', () => {
 
+  let token = '';
+
   beforeAll(async () => {
     await Beach.deleteMany({});
+    await User.deleteMany({});
+    const newUser = {
+      name: 'John Doe',
+      email: 'john@mail.com',
+      password: '1234'
+    };
+    const user = await (new User(newUser)).save();
+    token = AuthService.generateToken(user.toJSON());
   });
 
   afterEach(() => {
@@ -18,7 +30,7 @@ describe('Beach functional tests', () => {
         lat: 10.00,
         lng: 10.00,
       };
-      const { body, status } = await global.testRequest.post('/beach', ).send(newBeach);
+      const { body, status } = await global.testRequest.post('/beach', ).set({'x-access-token': token}).send(newBeach);
       expect(status).toBe(201);
       expect(body).toEqual(expect.objectContaining(newBeach));
     });
@@ -30,7 +42,7 @@ describe('Beach functional tests', () => {
         lat: 'invalid value',
         lng: 10.00,
       };
-      const { body, status } = await global.testRequest.post('/beach', ).send(newBeach);
+      const { body, status } = await global.testRequest.post('/beach', ).set({'x-access-token': token}).send(newBeach);
       expect(status).toBe(422);
       expect(body).toEqual({code: 422, error: 'Beach validation failed: lat: Cast to Number failed for value "invalid value" (type string) at path "lat"'});
     });
@@ -44,7 +56,7 @@ describe('Beach functional tests', () => {
       };
       jest.spyOn(Beach.prototype, 'save')
         .mockImplementationOnce(() => Promise.reject('Fails'))
-      const { body, status } = await global.testRequest.post('/beach', ).send(newBeach);
+      const { body, status } = await global.testRequest.post('/beach', ).set({'x-access-token': token}).send(newBeach);
       expect(status).toBe(500);
       expect(body).toEqual({code: 500, error: 'Internal Server Error'});
     });

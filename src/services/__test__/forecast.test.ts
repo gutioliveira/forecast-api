@@ -84,6 +84,7 @@ describe('Forecast Service', () => {
         lat,
         lng,
         rating: 1,
+        user: 'fake-id'
       },
     ];
     const response = await forecast.processForecastForBeaches(beaches);
@@ -111,6 +112,7 @@ describe('Forecast Service', () => {
         lat,
         lng,
         rating: 1,
+        user: 'fake-id'
       },
     ];
     const forecast = new Forecast(mockedStormGlass);

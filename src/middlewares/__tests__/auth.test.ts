@@ -31,7 +31,7 @@ describe('AuthMiddleware', () => {
     authMiddleware(req, res as object, next);
     expect(sendMock).toHaveBeenCalledWith({
       code: 401,
-      error: 'jwt malformed'
+      message: 'jwt malformed'
     })
   });
 });
