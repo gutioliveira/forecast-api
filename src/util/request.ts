@@ -1,11 +1,12 @@
 import axios, { AxiosRequestConfig, AxiosResponse, AxiosError } from 'axios';
 
 export enum HTTP_CODES {
-  VALIDATION_ERROR = 422,
-  CONFLICT = 409,
-  NOT_FOUND = 404,
   OK = 200,
   CREATED = 201,
+  UNAUTHORIZED = 401,
+  NOT_FOUND = 404,
+  CONFLICT = 409,
+  VALIDATION_ERROR = 422,
   INTERNAL_SERVER_ERROR = 500,
 }
 
