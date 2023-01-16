@@ -1,5 +1,5 @@
 {
-  "name": "metereologia",
+  "name": "forecast-api",
   "version": "1.0.0",
   "description": "Node.js API",
   "main": "index.js",
