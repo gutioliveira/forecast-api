@@ -39,6 +39,21 @@ describe('StormGlass client', () => {
   it('should return filtered normalized forecast from the StormGlass service if not all items are valid', async () => {
     mockedAxios.get.mockRejectedValue({ message: 'Network Error' });
     const stormGlass = new StormGlass(mockedAxios);
-    await expect(stormGlass.fetchPoints(lat, lng)).rejects.toThrow('Error');
+    await expect(stormGlass.fetchPoints(lat, lng)).rejects.toThrow(
+      'StormGlass Error: Network Error'
+    );
+  });
+
+  it('should get an StormGlassResponseError when the StormGlass service responds with error', async () => {
+    mockedAxios.get.mockRejectedValue({
+      status: 429,
+      data: { errors: ['Rate Limit reached'] },
+    });
+
+    const stormGlass = new StormGlass(mockedAxios);
+
+    await expect(stormGlass.fetchPoints(lat, lng)).rejects.toThrow(
+      'Unexpected error returned by the StormGlass service: Error: {"errors":["Rate Limit reached"]} Code: 429'
+    );
   });
 });
