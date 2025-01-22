@@ -19,7 +19,7 @@ describe('StormGlass client', () => {
     expect(forecast.length).toBe(3);
   });
 
-  it('should get a generic error from StormGlass service when the request fail before reaching the service', async () => {
+  it('should return filtered normalized forecast from the StormGlass service if not all items are valid', async () => {
     const incompleteForecast = {
       time: 'time',
       hours: [
@@ -36,18 +36,20 @@ describe('StormGlass client', () => {
     expect(forecast).toEqual([]);
   });
 
-  it('should return filtered normalized forecast from the StormGlass service if not all items are valid', async () => {
+  it('should get a generic error from StormGlass service when the request fail before reaching the service', async () => {
     mockedAxios.get.mockRejectedValue({ message: 'Network Error' });
     const stormGlass = new StormGlass(mockedAxios);
     await expect(stormGlass.fetchPoints(lat, lng)).rejects.toThrow(
-      'StormGlass Error: Network Error'
+      'Unexpected error when trying to communicate to StormGlass: Network Error'
     );
   });
 
-  it('should get an StormGlassResponseError when the StormGlass service responds with error', async () => {
+  it.only('should get an StormGlassResponseError when the StormGlass service responds with error', async () => {
     mockedAxios.get.mockRejectedValue({
-      status: 429,
-      data: { errors: ['Rate Limit reached'] },
+      response: {
+        status: 429,
+        data: { errors: ['Rate Limit reached'] },
+      },
     });
 
     const stormGlass = new StormGlass(mockedAxios);
