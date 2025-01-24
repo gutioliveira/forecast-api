@@ -25,6 +25,7 @@ export interface StormGlassForecastResponse {
 }
 
 export interface ForecastPoint {
+  time: string;
   swellDirection: number;
   swellHeight: number;
   swellPeriod: number;
