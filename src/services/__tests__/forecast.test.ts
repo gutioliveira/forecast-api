@@ -1,21 +1,25 @@
 import { StormGlass } from '@src/clients/stormGlass';
 import stormGlassClientNormalizedResponseFixture from '@test/fixtures/stormglass_normalized_response_3_hours.json';
-import { Forecast } from '@src/services/forecast';
+import {
+  Forecast,
+  ForecastProcessingInternalError,
+} from '@src/services/forecast';
 
 jest.mock('@src/clients/stormGlass');
 
 describe('Forecast Service', () => {
-  StormGlass.prototype.fetchPoints = jest
-    .fn()
-    .mockResolvedValue(stormGlassClientNormalizedResponseFixture);
+  const beach = {
+    lat: -33.792726,
+    lng: 151.289824,
+    name: 'Manly',
+    position: 'E',
+  };
+  const mockedStormGlassService = new StormGlass() as jest.Mocked<StormGlass>;
 
   it('should return the forecast for a list of beaches', async () => {
-    const beach = {
-      lat: -33.792726,
-      lng: 151.289824,
-      name: 'Manly',
-      position: 'E',
-    };
+    mockedStormGlassService.fetchPoints = jest
+      .fn()
+      .mockResolvedValue(stormGlassClientNormalizedResponseFixture);
     const expectedResponse = [
       {
         time: '2020-04-26T00:00:00+00:00',
@@ -69,10 +73,33 @@ describe('Forecast Service', () => {
         ],
       },
     ];
-    const forecastService = new Forecast(new StormGlass());
+    const forecastService = new Forecast(mockedStormGlassService);
     const beachesWithRatings = await forecastService.processForecastForBeaches([
       { ...beach, user: 'test-user' },
     ]);
     expect(beachesWithRatings).toEqual(expectedResponse);
+  });
+
+  it('should return the forecast for a list of beaches', async () => {
+    const forecastService = new Forecast(mockedStormGlassService);
+    const beachesWithRatings = await forecastService.processForecastForBeaches(
+      []
+    );
+    expect(beachesWithRatings).toEqual([]);
+  });
+
+  it('should throw internal processing error when something goes wrong in the processing', async () => {
+    mockedStormGlassService.fetchPoints = jest.fn().mockRejectedValue({
+      response: {
+        status: 429,
+        data: { errors: ['Rate Limit reached'] },
+      },
+    });
+    const forecastService = new Forecast(mockedStormGlassService);
+    await expect(
+      forecastService.processForecastForBeaches([
+        { ...beach, user: 'test-user' },
+      ])
+    ).rejects.toThrow(ForecastProcessingInternalError);
   });
 });

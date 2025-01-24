@@ -1,4 +1,5 @@
 import { ForecastPoint, StormGlass } from '@src/clients/stormGlass';
+import { InternalError } from '@src/util/error/internal-error';
 
 export interface Beach {
   lat: number;
@@ -17,12 +18,26 @@ export interface TimeForecast {
   forecast: BeachForecast[];
 }
 
+export class ForecastProcessingInternalError extends InternalError {
+  constructor(message: string) {
+    super(`Unexpected error during the forecast processing: ${message}`);
+  }
+}
+
 export class Forecast {
   constructor(protected stormGlass: StormGlass = new StormGlass()) {}
 
   public async processForecastForBeaches(
     beaches: Beach[]
   ): Promise<TimeForecast[]> {
+    try {
+      return this.groupBeachForecastsByTime(await this.processPoints(beaches));
+    } catch (e) {
+      throw new ForecastProcessingInternalError((e as Error).message);
+    }
+  }
+
+  private async processPoints(beaches: Beach[]): Promise<BeachForecast[]> {
     const beachForecasts: BeachForecast[] = [];
     for (const beach of beaches) {
       const points = await this.stormGlass.fetchPoints(beach.lat, beach.lng);
@@ -39,14 +54,14 @@ export class Forecast {
         });
       });
     }
-    return this.groupBeachForecastsByTime(beachForecasts);
+    return beachForecasts;
   }
 
   private groupBeachForecastsByTime(
     beachForecast: BeachForecast[]
   ): TimeForecast[] {
     const timeKeyMapped: { [key: string]: BeachForecast[] } = {};
-    beachForecast.map((beachForecast) => {
+    beachForecast.forEach((beachForecast) => {
       if (timeKeyMapped[beachForecast.time]) {
         timeKeyMapped[beachForecast.time].push(beachForecast);
       } else {
