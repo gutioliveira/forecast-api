@@ -31,7 +31,8 @@ export class Forecast {
     beaches: Beach[]
   ): Promise<TimeForecast[]> {
     try {
-      return this.groupBeachForecastsByTime(await this.processPoints(beaches));
+      const beachForecast = await this.processPoints(beaches);
+      return this.groupBeachForecastsByTime(beachForecast);
     } catch (e) {
       throw new ForecastProcessingInternalError((e as Error).message);
     }
