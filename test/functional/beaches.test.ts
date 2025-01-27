@@ -1,11 +1,6 @@
 import { Beach } from '@src/models/beach';
 
-jest.mock('@src/models/beach');
-
 describe('Beach functional tests', () => {
-  beforeEach(() => {
-    jest.clearAllMocks();
-  });
   beforeAll(async () => {
     await Beach.deleteMany({});
   });
@@ -37,7 +32,18 @@ describe('Beach functional tests', () => {
       });
     });
 
-    it.skip('should throw 500 when there is an unexpected error', async () => {
+    it('should throw 500 when there is an unexpected error', async () => {
+      jest
+        .spyOn(Beach.prototype, 'save')
+        .mockRejectedValueOnce('fail to create beach');
+      const newBeach = {
+        lat: -33.792726,
+        lng: 151.289824,
+        name: 'Manly',
+        position: 'E',
+      };
+      const response = await global.testRequest.post('/beaches').send(newBeach);
+      expect(response.status).toBe(500);
     });
   });
 });

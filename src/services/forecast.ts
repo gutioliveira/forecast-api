@@ -1,15 +1,8 @@
 import { ForecastPoint, StormGlass } from '@src/clients/stormGlass';
+import { Beach } from '@src/models/beach';
 import { InternalError } from '@src/util/error/internal-error';
 
-export interface Beach {
-  lat: number;
-  lng: number;
-  name: string;
-  position: string;
-  user: string;
-}
-
-export interface BeachForecast extends Omit<Beach, 'user'>, ForecastPoint {
+export interface BeachForecast extends Beach, ForecastPoint {
   rating: number;
 }
 
@@ -62,11 +55,11 @@ export class Forecast {
     beachForecast: BeachForecast[]
   ): TimeForecast[] {
     const timeKeyMapped: { [key: string]: BeachForecast[] } = {};
-    beachForecast.forEach((beachForecast) => {
-      if (timeKeyMapped[beachForecast.time]) {
-        timeKeyMapped[beachForecast.time].push(beachForecast);
+    beachForecast.forEach((b) => {
+      if (timeKeyMapped[b.time]) {
+        timeKeyMapped[b.time].push(b);
       } else {
-        timeKeyMapped[beachForecast.time] = [beachForecast];
+        timeKeyMapped[b.time] = [b];
       }
     });
     return Object.keys(timeKeyMapped).map((key) => ({

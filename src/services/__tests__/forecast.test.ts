@@ -4,6 +4,7 @@ import {
   Forecast,
   ForecastProcessingInternalError,
 } from '@src/services/forecast';
+import { BeachPosition } from '@src/models/beach';
 
 jest.mock('@src/clients/stormGlass');
 
@@ -12,7 +13,7 @@ describe('Forecast Service', () => {
     lat: -33.792726,
     lng: 151.289824,
     name: 'Manly',
-    position: 'E',
+    position: BeachPosition.E,
   };
   const mockedStormGlassService = new StormGlass() as jest.Mocked<StormGlass>;
 
@@ -75,7 +76,7 @@ describe('Forecast Service', () => {
     ];
     const forecastService = new Forecast(mockedStormGlassService);
     const beachesWithRatings = await forecastService.processForecastForBeaches([
-      { ...beach, user: 'test-user' },
+      beach,
     ]);
     expect(beachesWithRatings).toEqual(expectedResponse);
   });
@@ -97,9 +98,7 @@ describe('Forecast Service', () => {
     });
     const forecastService = new Forecast(mockedStormGlassService);
     await expect(
-      forecastService.processForecastForBeaches([
-        { ...beach, user: 'test-user' },
-      ])
+      forecastService.processForecastForBeaches([beach])
     ).rejects.toThrow(ForecastProcessingInternalError);
   });
 });
