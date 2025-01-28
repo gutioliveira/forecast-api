@@ -9,7 +9,6 @@ import { BeachesController } from './controllers/beach';
 export class SetupServer extends Server {
   constructor(private port = 3000) {
     super();
-    this.init();
   }
 
   public async init(): Promise<void> {

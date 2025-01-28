@@ -2,9 +2,6 @@ import { InternalError } from '@src/util/error/internal-error';
 import config, { IConfig } from 'config';
 import * as HTTPUtil from '@src/util/request';
 
-const API_KEY = '';
-// '395497fe-480e-11ed-a138-0242ac130002-39549858-480e-11ed-a138-0242ac130002';
-
 export interface StormGlassPointSource {
   [key: string]: number;
 }
