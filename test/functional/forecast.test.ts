@@ -1,5 +1,6 @@
 import nock from 'nock';
 import stormGlassWeather3HoursFixture from '@test/fixtures/stormglass_weather_3_hours.json';
+import apiResponseForecast3Hours from '@test/fixtures/api_response_forecast_3_hours.json';
 import { Beach } from '@src/models/beach';
 
 describe('Forecast functional tests', () => {
@@ -31,67 +32,27 @@ describe('Forecast functional tests', () => {
       .reply(200, stormGlassWeather3HoursFixture);
     const { body, status } = await global.testRequest.get('/forecast');
     expect(status).toBe(200);
-    expect(body).toEqual([
-      {
-        time: '2020-04-26T00:00:00+00:00',
-        forecast: [
-          {
-            lat: -33.792726,
-            lng: 151.289824,
-            name: 'Manly',
-            position: 'E',
-            rating: 1,
-            swellDirection: 64.26,
-            swellHeight: 0.15,
-            swellPeriod: 3.89,
-            time: '2020-04-26T00:00:00+00:00',
-            waveDirection: 231.38,
-            waveHeight: 0.47,
-            windDirection: 299.45,
-            windSpeed: 100,
-          },
-        ],
+    expect(body).toEqual(apiResponseForecast3Hours);
+  });
+
+  it('should return a 500 error if something goes wrong', async () => {
+    nock('https://api.stormglass.io:443', {
+      encodedQueryParams: true,
+      reqheaders: {
+        Authorization: (): boolean => true,
       },
-      {
-        time: '2020-04-26T01:00:00+00:00',
-        forecast: [
-          {
-            lat: -33.792726,
-            lng: 151.289824,
-            name: 'Manly',
-            position: 'E',
-            rating: 1,
-            swellDirection: 123.41,
-            swellHeight: 0.21,
-            swellPeriod: 3.67,
-            time: '2020-04-26T01:00:00+00:00',
-            waveDirection: 232.12,
-            waveHeight: 0.46,
-            windDirection: 310.48,
-            windSpeed: 100,
-          },
-        ],
-      },
-      {
-        time: '2020-04-26T02:00:00+00:00',
-        forecast: [
-          {
-            lat: -33.792726,
-            lng: 151.289824,
-            name: 'Manly',
-            position: 'E',
-            rating: 1,
-            time: '2020-04-26T02:00:00+00:00',
-            swellDirection: 182.56,
-            swellHeight: 0.28,
-            swellPeriod: 3.44,
-            waveDirection: 232.86,
-            waveHeight: 0.46,
-            windDirection: 321.5,
-            windSpeed: 100,
-          },
-        ],
-      },
-    ]);
+    })
+      .defaultReplyHeaders({ 'access-control-allow-origin': '*' })
+      .get('/v2/weather/point')
+      .query({
+        lat: '-33.792726',
+        lng: '151.289824',
+        params: /(.*)/,
+        source: 'noaa',
+      })
+      .replyWithError('Something went wrong with the stormGlass service');
+    const { body, status } = await global.testRequest.get('/forecast');
+    expect(status).toBe(500);
+    expect(body).toEqual({ error: 'Internal Server Error' });
   });
 });

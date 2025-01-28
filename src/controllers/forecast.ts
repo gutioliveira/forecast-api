@@ -12,8 +12,13 @@ export class ForecastController {
     _: Request,
     res: Response
   ): Promise<void> {
-    const beaches = await Beach.find({});
-    const forecastForBeaches = await forecast.processForecastForBeaches(beaches);
-    res.status(200).send(forecastForBeaches);
+    try {
+      const beaches = await Beach.find({});
+      const forecastForBeaches =
+        await forecast.processForecastForBeaches(beaches);
+      res.status(200).send(forecastForBeaches);
+    } catch (e) {
+      res.status(500).send({ error: 'Internal Server Error' });
+    }
   }
 }
