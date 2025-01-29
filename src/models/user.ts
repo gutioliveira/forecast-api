@@ -1,4 +1,4 @@
-import bcrypt from 'bcrypt';
+import { AuthService } from '@src/services/auth';
 import mongoose, { Document, Model } from 'mongoose';
 
 export interface User {
@@ -33,26 +33,12 @@ const schema = new mongoose.Schema<User>(
   }
 );
 
-export async function encryptPassword(
-  password: string,
-  salt = 10
-): Promise<string> {
-  return await bcrypt.hash(password, salt);
-}
-
-export async function comparePassword(
-  password: string,
-  encryptedPassword: string
-): Promise<boolean> {
-  return bcrypt.compare(password, encryptedPassword);
-}
-
 schema.pre<User & Document>('save', async function (): Promise<void> {
   if (!this.password || !this.isModified('password')) {
     return;
   }
   try {
-    const hashedPassword = await encryptPassword(this.password);
+    const hashedPassword = await AuthService.encryptPassword(this.password);
     this.password = hashedPassword;
   } catch (e) {
     console.error(
