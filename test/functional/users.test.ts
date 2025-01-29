@@ -1,10 +1,10 @@
-import { User } from '@src/models/user';
+import { comparePassword, User } from '@src/models/user';
 
 describe('User functional tests', () => {
   beforeEach(async () => {
     await User.deleteMany({});
   });
-  it('should succesfully create a new user', async () => {
+  it('should succesfully create a new user with encrypted password', async () => {
     const newUser = {
       name: 'John Doe',
       email: 'john@mail.com',
@@ -12,7 +12,15 @@ describe('User functional tests', () => {
     };
     const response = await global.testRequest.post('/users').send(newUser);
     expect(response.status).toBe(201);
-    expect(response.body).toEqual(expect.objectContaining(newUser));
+    expect(
+      await comparePassword(newUser.password, response.body.password)
+    ).toBeTruthy();
+    expect(response.body).toEqual(
+      expect.objectContaining({
+        ...newUser,
+        ...{ password: expect.any(String) },
+      })
+    );
   });
 
   it('should not create an user when passing an invalid email', async () => {
