@@ -1,5 +1,4 @@
 import mongoose, { Model, Schema } from "mongoose";
-import { User } from "./user";
 
 export enum BeachPosition {
   S = 'S',
@@ -14,7 +13,7 @@ export interface Beach {
   position: BeachPosition;
   lat: number;
   lng: number;
-  user: Partial<User>;
+  user?: string;
 }
 
 const schema = new mongoose.Schema<Beach>({

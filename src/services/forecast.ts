@@ -42,11 +42,7 @@ export class Forecast {
             lng: beach.lng,
             name: beach.name,
             position: beach.position,
-            user: {
-              name: 'name',
-              email: 'email',
-              password: 'password',
-            },
+            user: 'id',
           },
           rating: 1, // TODO: remove current hardcoded value
           ...point,
