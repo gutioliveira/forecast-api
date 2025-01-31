@@ -58,7 +58,7 @@ describe('User functional tests', () => {
     });
   });
 
-  describe.only('User Authentication', () => {
+  describe('User Authentication', () => {
     it('should return a token when authenticating a valid user', async () => {
       const newUser = {
         name: 'John Doe',

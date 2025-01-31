@@ -30,10 +30,7 @@ export class UsersController extends BaseController {
         res
           .status(200)
           .send({
-            token: AuthService.generateToken({
-              name: user.name,
-              email: user.email,
-            }),
+            token: AuthService.generateToken(user.toJSON()),
           });
       } else {
         res.status(404).send({ error: 'User or Password invalid' });
