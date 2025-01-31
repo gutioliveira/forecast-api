@@ -13,11 +13,8 @@ describe('Beach functional tests', () => {
       email: 'mail@mail.com',
       password: '123456',
     });
-    await user.save();
-    const { body } = await global.testRequest
-      .post('/users/authenticate')
-      .send({ email: 'mail@mail.com', password: '123456' });
-    token = body.token;
+    const newUser = await user.save();
+    token = AuthService.generateToken(newUser.toJSON());
   });
   describe('When creating a beach', () => {
     it('should create a beach successfully', async () => {

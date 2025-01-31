@@ -3,8 +3,10 @@ import stormGlassWeather3HoursFixture from '@test/fixtures/stormglass_weather_3_
 import apiResponseForecast3Hours from '@test/fixtures/api_response_forecast_3_hours.json';
 import { Beach } from '@src/models/beach';
 import { User } from '@src/models/user';
+import { AuthService } from '@src/services/auth';
 
 describe('Forecast functional tests', () => {
+  let token = '';
   beforeEach(async () => {
     await Beach.deleteMany({});
     await User.deleteMany({});
@@ -14,6 +16,7 @@ describe('Forecast functional tests', () => {
       password: '123456',
     });
     const newUser = await user.save();
+    token = AuthService.generateToken(newUser.toJSON());
     const beach = new Beach({
       lat: -33.792726,
       lng: 151.289824,
@@ -39,7 +42,9 @@ describe('Forecast functional tests', () => {
         source: 'noaa',
       })
       .reply(200, stormGlassWeather3HoursFixture);
-    const { body, status } = await global.testRequest.get('/forecast');
+    const { body, status } = await global.testRequest
+      .get('/forecast')
+      .set('x-access-token', token);
     expect(status).toBe(200);
     expect(body).toEqual(apiResponseForecast3Hours);
   });
@@ -60,7 +65,9 @@ describe('Forecast functional tests', () => {
         source: 'noaa',
       })
       .replyWithError('Something went wrong with the stormGlass service');
-    const { body, status } = await global.testRequest.get('/forecast');
+    const { body, status } = await global.testRequest
+      .get('/forecast')
+      .set('x-access-token', token);
     expect(status).toBe(500);
     expect(body).toEqual({ error: 'Internal Server Error' });
   });
