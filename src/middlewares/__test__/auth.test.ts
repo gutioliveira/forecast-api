@@ -29,9 +29,9 @@ describe('AuthMiddleware', () => {
     } as unknown as Response;
     const nextFake = jest.fn();
     authMiddleware(reqFake, resFake, nextFake);
-    expect(statusFake).toHaveBeenCalledWith(411);
+    expect(statusFake).toHaveBeenCalledWith(401);
     expect(sendFake).toHaveBeenCalledWith({
-      code: 411,
+      code: 401,
       error: 'jwt malformed',
     });
   });
@@ -49,7 +49,7 @@ describe('AuthMiddleware', () => {
     } as unknown as Response;
     const nextFake = jest.fn();
     authMiddleware(reqFake, resFake, nextFake);
-    expect(statusFake).toHaveBeenCalledWith(411);
+    expect(statusFake).toHaveBeenCalledWith(401);
     expect(sendFake).toHaveBeenCalledWith({
       code: 401,
       error: 'jwt malformed',

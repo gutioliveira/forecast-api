@@ -9,6 +9,7 @@ export enum BeachPosition {
 
 export interface Beach {
   _id?: string;
+  id?: string;
   name: string;
   position: BeachPosition;
   lat: number;

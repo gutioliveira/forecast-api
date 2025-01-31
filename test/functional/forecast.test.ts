@@ -2,15 +2,24 @@ import nock from 'nock';
 import stormGlassWeather3HoursFixture from '@test/fixtures/stormglass_weather_3_hours.json';
 import apiResponseForecast3Hours from '@test/fixtures/api_response_forecast_3_hours.json';
 import { Beach } from '@src/models/beach';
+import { User } from '@src/models/user';
 
 describe('Forecast functional tests', () => {
   beforeEach(async () => {
     await Beach.deleteMany({});
+    await User.deleteMany({});
+    const user = new User({
+      name: 'name',
+      email: 'mail@mail.com',
+      password: '123456',
+    });
+    const newUser = await user.save();
     const beach = new Beach({
       lat: -33.792726,
       lng: 151.289824,
       name: 'Manly',
       position: 'E',
+      user: newUser.id,
     });
     await beach.save();
   });
