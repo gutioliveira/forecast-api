@@ -6,7 +6,7 @@
   "scripts": {
     "build": "tsc",
     "start": "yarn build && node dist/src/index.js",
-    "start:dev": "ts-node-dev 'src/index.ts'",
+    "start:local": "ts-node-dev --files 'src/index.ts' | pino-pretty -c",
     "test": "yarn test:unit && yarn test:functional",
     "test:functional": "jest --projects ./test --runInBand",
     "test:unit": "jest",
@@ -19,7 +19,9 @@
   "license": "ISC",
   "devDependencies": {
     "@types/bcrypt": "^5.0.2",
+    "@types/cors": "^2.8.17",
     "@types/express": "^5.0.0",
+    "@types/express-pino-logger": "^4.0.5",
     "@types/jest": "^29.5.14",
     "@types/jsonwebtoken": "^9.0.8",
     "@types/lodash": "^4.17.14",
@@ -27,12 +29,14 @@
     "@types/mongoose": "^5.11.97",
     "@types/nock": "^11.1.0",
     "@types/node": "^22.10.7",
+    "@types/pino": "^7.0.5",
     "@types/supertest": "^6.0.2",
     "@typescript-eslint/eslint-plugin": "^8.20.0",
     "@typescript-eslint/parser": "^8.20.0",
     "eslint": "^9.18.0",
     "jest": "^29.7.0",
     "nock": "^14.0.0",
+    "pino-pretty": "^13.0.0",
     "prettier": "^3.4.2",
     "supertest": "^7.0.0",
     "ts-jest": "^29.2.5",
@@ -46,10 +50,14 @@
     "bcrypt": "^5.1.1",
     "body-parser": "^1.20.3",
     "config": "^3.3.12",
+    "cors": "^2.8.5",
     "express": "^4.21.2",
+    "express-pino-logger": "^7.0.0",
+    "http-status-codes": "^2.3.0",
     "jsonwebtoken": "^9.0.2",
     "lodash": "^4.17.21",
     "module-alias": "^2.2.3",
-    "mongoose": "^8.9.5"
+    "mongoose": "^8.9.5",
+    "pino": "^9.6.0"
   }
 }

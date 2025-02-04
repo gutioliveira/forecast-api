@@ -16,7 +16,7 @@ export class BeachesController extends BaseController {
       const beach = await beachModel.save();
       res.status(201).send(beach);
     } catch (e) {
-      this.sendResponseError(res, e);
+      this.sendCreatedErrorResponse(res, e);
     }
   }
 }

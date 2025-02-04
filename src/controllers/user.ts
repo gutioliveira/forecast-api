@@ -13,7 +13,7 @@ export class UsersController extends BaseController {
       const newUser = await user.save();
       res.status(201).send(newUser);
     } catch (e) {
-      this.sendResponseError(res, e);
+      this.sendCreatedErrorResponse(res, e);
     }
   }
 
@@ -27,16 +27,17 @@ export class UsersController extends BaseController {
         user &&
         (await AuthService.comparePassword(req.body.password, user.password))
       ) {
-        res
-          .status(200)
-          .send({
-            token: AuthService.generateToken(user.toJSON()),
-          });
+        res.status(200).send({
+          token: AuthService.generateToken(user.toJSON()),
+        });
       } else {
-        res.status(404).send({ error: 'User or Password invalid' });
+        this.sendErrorResponse(res, {
+          code: 404,
+          message: 'User or Password invalid',
+        });
       }
     } catch (e) {
-      this.sendResponseError(res, e);
+      this.sendCreatedErrorResponse(res, e);
     }
   }
 }

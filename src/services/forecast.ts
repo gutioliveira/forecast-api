@@ -1,4 +1,5 @@
 import { ForecastPoint, StormGlass } from '@src/clients/stormGlass';
+import logger from '@src/logger';
 import { Beach } from '@src/models/beach';
 import { InternalError } from '@src/util/error/internal-error';
 
@@ -25,8 +26,10 @@ export class Forecast {
   ): Promise<TimeForecast[]> {
     try {
       const beachForecast = await this.processPoints(beaches);
+      logger.info(`Preparing the forecast for ${beaches.length} beaches`);
       return this.groupBeachForecastsByTime(beachForecast);
     } catch (e) {
+      logger.error(e);
       throw new ForecastProcessingInternalError((e as Error).message);
     }
   }
