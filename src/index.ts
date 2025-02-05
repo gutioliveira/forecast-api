@@ -1,3 +1,4 @@
+import config from 'config';
 import logger from './logger';
 import { SetupServer } from './server';
 
@@ -21,7 +22,7 @@ process.on('uncaughtException', (error) => {
 
 (async () => {
   try {
-    const server = new SetupServer();
+    const server = new SetupServer(config.get('App.port'));
     await server.init();
     server.start();
 
@@ -39,6 +40,7 @@ process.on('uncaughtException', (error) => {
       });
     });
   } catch (e) {
+    logger.error(e)
     process.exit(ExitStatus.Failure);
   }
 })();
