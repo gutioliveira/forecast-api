@@ -41,11 +41,15 @@ jobs:
     - name: Run all tests
       run: yarn test
 
+    - name: Install Heroku CLI
+      run: |
+        curl https://cli-assets.heroku.com/install.sh | sh
+
     - name: Deploy application
       if: ${{ github.ref == 'refs/heads/main' }}
       uses: akhileshns/heroku-deploy@v3.13.15
       with:
         heroku_api_key: ${{ secrets.HEROKU_API_KEY }}
         heroku_app_name: "gustavo-surf-forecast"
-        heroku_email: "gustavo.cavalcante.oliveira@gmail.com"
+        heroku_email: ${{ secrets.HEROKU_EMAIL }}
         buildpack: "https://github.com/zidizei/heroku-buildpack-tsc#v2.0"
