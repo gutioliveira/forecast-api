@@ -69,6 +69,10 @@ describe('Forecast functional tests', () => {
       .get('/forecast')
       .set('x-access-token', token);
     expect(status).toBe(500);
-    expect(body).toEqual({ error: 'Internal Server Error' });
+    expect(body).toEqual({
+      code: 500,
+      error: 'Internal Server Error',
+      message: 'Internal Server Error',
+    });
   });
 });

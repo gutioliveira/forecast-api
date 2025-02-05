@@ -38,7 +38,8 @@ describe('User functional tests', () => {
       expect(response.status).toBe(422);
       expect(response.body).toEqual({
         code: 422,
-        error: 'User validation failed: email: Email is not valid',
+        error: 'Unprocessable Entity',
+        message: 'User validation failed: email: Email is not valid',
       });
     });
 
@@ -53,7 +54,8 @@ describe('User functional tests', () => {
       expect(response.status).toBe(409);
       expect(response.body).toEqual({
         code: 409,
-        error: 'Email already in use',
+        error: 'Conflict',
+        message: 'Email already in use',
       });
     });
   });
@@ -90,7 +92,11 @@ describe('User functional tests', () => {
           password: '1234',
         });
       expect(response.status).toBe(404);
-      expect(response.body).toEqual({ error: 'User or Password invalid' });
+      expect(response.body).toEqual({
+        code: 404,
+        error: 'Not Found',
+        message: 'User or Password invalid',
+      });
     });
 
     it('should return 404 when passing an invalid email', async () => {
@@ -107,7 +113,11 @@ describe('User functional tests', () => {
           password: '1234',
         });
       expect(response.status).toBe(404);
-      expect(response.body).toEqual({ error: 'User or Password invalid' });
+      expect(response.body).toEqual({
+        code: 404,
+        error: 'Not Found',
+        message: 'User or Password invalid',
+      });
     });
   });
 });
