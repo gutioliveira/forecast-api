@@ -15,10 +15,10 @@ describe('Forecast Service', () => {
     name: 'Manly',
     position: GeoPosition.E,
   };
-  const mockedStormGlassService = new StormGlass() as jest.Mocked<StormGlass>;
+  const mockedStormGlassClient = new StormGlass() as jest.Mocked<StormGlass>;
 
   it('should return the forecast for a list of beaches', async () => {
-    mockedStormGlassService.fetchPoints = jest
+    mockedStormGlassClient.fetchPoints = jest
       .fn()
       .mockResolvedValue(stormGlassClientNormalizedResponseFixture);
     const expectedResponse = [
@@ -44,7 +44,7 @@ describe('Forecast Service', () => {
         forecast: [
           {
             ...beach,
-            rating: 1,
+            rating: 2,
             swellDirection: 123.41,
             swellHeight: 0.21,
             swellPeriod: 3.67,
@@ -61,7 +61,7 @@ describe('Forecast Service', () => {
         forecast: [
           {
             ...beach,
-            rating: 1,
+            rating: 2,
             swellDirection: 182.56,
             swellHeight: 0.28,
             swellPeriod: 3.44,
@@ -74,7 +74,7 @@ describe('Forecast Service', () => {
         ],
       },
     ];
-    const forecastService = new Forecast(mockedStormGlassService);
+    const forecastService = new Forecast(mockedStormGlassClient);
     const beachesWithRatings = await forecastService.processForecastForBeaches([
       beach,
     ]);
@@ -82,7 +82,7 @@ describe('Forecast Service', () => {
   });
 
   it('should return the forecast for a list of beaches', async () => {
-    const forecastService = new Forecast(mockedStormGlassService);
+    const forecastService = new Forecast(mockedStormGlassClient);
     const beachesWithRatings = await forecastService.processForecastForBeaches(
       []
     );
@@ -90,13 +90,13 @@ describe('Forecast Service', () => {
   });
 
   it('should throw internal processing error when something goes wrong in the processing', async () => {
-    mockedStormGlassService.fetchPoints = jest.fn().mockRejectedValue({
+    mockedStormGlassClient.fetchPoints = jest.fn().mockRejectedValue({
       response: {
         status: 429,
         data: { errors: ['Rate Limit reached'] },
       },
     });
-    const forecastService = new Forecast(mockedStormGlassService);
+    const forecastService = new Forecast(mockedStormGlassClient);
     await expect(
       forecastService.processForecastForBeaches([beach])
     ).rejects.toThrow(ForecastProcessingInternalError);

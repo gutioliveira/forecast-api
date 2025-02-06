@@ -2,6 +2,7 @@ import { ForecastPoint, StormGlass } from '@src/clients/stormGlass';
 import logger from '@src/logger';
 import { Beach } from '@src/models/beach';
 import { InternalError } from '@src/util/error/internal-error';
+import { Rating } from './rating';
 
 export interface BeachForecast extends Beach, ForecastPoint {
   rating: number;
@@ -37,6 +38,7 @@ export class Forecast {
   private async processPoints(beaches: Beach[]): Promise<BeachForecast[]> {
     const beachForecasts: BeachForecast[] = [];
     for (const beach of beaches) {
+      const ratingService = new Rating(beach);
       const points = await this.stormGlass.fetchPoints(beach.lat, beach.lng);
       points.forEach((point) => {
         beachForecasts.push({
@@ -46,7 +48,7 @@ export class Forecast {
             name: beach.name,
             position: beach.position,
           },
-          rating: 1, // TODO: remove current hardcoded value
+          rating: ratingService.getRatingForPoint(point),
           ...point,
         });
       });
