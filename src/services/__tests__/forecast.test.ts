@@ -4,7 +4,7 @@ import {
   Forecast,
   ForecastProcessingInternalError,
 } from '@src/services/forecast';
-import { BeachPosition } from '@src/models/beach';
+import { GeoPosition } from '@src/models/beach';
 
 jest.mock('@src/clients/stormGlass');
 
@@ -13,7 +13,7 @@ describe('Forecast Service', () => {
     lat: -33.792726,
     lng: 151.289824,
     name: 'Manly',
-    position: BeachPosition.E,
+    position: GeoPosition.E,
   };
   const mockedStormGlassService = new StormGlass() as jest.Mocked<StormGlass>;
 

@@ -121,7 +121,7 @@ describe('User functional tests', () => {
     });
   });
 
-  describe.only('When fetching user information', () => {
+  describe('When fetching user information', () => {
     it('should return current user when there is a user for that token', async () => {
       const user = await new User({
         name: 'John Doe',
