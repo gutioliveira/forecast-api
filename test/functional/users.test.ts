@@ -120,4 +120,37 @@ describe('User functional tests', () => {
       });
     });
   });
+
+  describe.only('When fetching user information', () => {
+    it('should return current user when there is a user for that token', async () => {
+      const user = await new User({
+        name: 'John Doe',
+        email: 'email@mail.com',
+        password: '123456',
+      }).save();
+      const token = AuthService.generateToken(user.toJSON());
+      const response = await global.testRequest
+        .get('/users/me')
+        .set('x-access-token', token);
+      expect(response.status).toBe(200);
+      expect(response.body).toMatchObject(JSON.parse(JSON.stringify({ user })));
+    });
+
+    it('should return 404 when there is not a user for that token', async () => {
+      const token = AuthService.generateToken({
+        name: 'John Doe',
+        email: 'email@mail.com',
+        password: '123456',
+      });
+      const response = await global.testRequest
+        .get('/users/me')
+        .set('x-access-token', token);
+      expect(response.status).toBe(404);
+      expect(response.body).toEqual({
+        code: 404,
+        error: 'Not Found',
+        message: 'User not found',
+      });
+    });
+  });
 });
